@@ -1,0 +1,77 @@
+= Logback
+:toc:
+:toc-title: 目次
+:figure-caption: 図
+:table-caption: 表
+:toclevels: 3
+:pagenums:
+:sectnums:
+:imagesdir: images
+:source-highlighter: prettify
+
+
+== Markerの使い道
+Markerの使い道がよくわからん。マーキングして、それを元にアペンダーとかで判定できるようだがいかんせん便利さにかける・・・ +
+本当に実装した人の意図はなんなのだろうか。
+
+
+=== AppenderのFileterでMarkerによる判定を行う
+例えば、監査ログ等である特定のMarkerが入っている時のみ出力させるような制御をする場合に一番簡単な例であると以下のようにやるみたい。
+まずはMarkerを作る。
+
+[source,java]
+----
+import org.slf4j.Marker;
+import org.slf4j.MarkerFactory;
+
+public class Markers {
+	public static final Marker AUDIT = MarkerFactory.getMarker("AUDIT");
+}
+
+----
+
+次にAppenderで利用するFilterを作る。
+
+[source,java]
+----
+import ch.qos.logback.classic.spi.ILoggingEvent;
+import ch.qos.logback.core.filter.Filter;
+import ch.qos.logback.core.spi.FilterReply;
+
+public class AuditFilter extends Filter<ILoggingEvent> {
+	@Override
+	public FilterReply decide(ILoggingEvent event) {
+		if (event.getMarker() != null && event.getMarker().getName().equals("AUDIT")) {
+			return FilterReply.ACCEPT;
+		} else {
+			return FilterReply.DENY;
+		}
+	}
+}
+----
+
+これを利用するlogbackの定義ファイルは以下のように書く。
+
+[source,XML]
+----
+<appender name="CONSOLE2" class="ch.qos.logback.core.ConsoleAppender">
+    <filter class="com.tower.freestyle.common.AuditFilter"/>
+	<encoder>
+		<pattern>
+			%-4relative 監査ログ [%thread] %-5level %logger - %msg%n
+		</pattern>
+		<charset>utf8</charset>
+	</encoder>
+</appender>
+----
+
+ログを実際出力する部分はこんな実装。
+
+[source,java]
+----
+log.info(Markers.AUDIT, "監査サンプル");
+----
+
+実行してみてわかったのだが、この定義方法では監査ログの出力とは全く無関係な場所でもFilterが実行され毎回判定ロジックが入ってしまうようだ・・・これではログの機能として正直無駄となりすぎるため採用できない・・・どうしたもんか。 +
+ただ、この方法を最初に試したのはSlf4jのロガーをいちいち自分で取得するコードを書かずにlombokを利用して出しているためgetLoggerが呼べない（呼びたくない）という理由がでかい。
+

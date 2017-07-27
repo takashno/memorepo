@@ -1,0 +1,169 @@
+= SpringBoot
+:toc:
+:toc-title: 目次
+:figure-caption: 図
+:table-caption: 表
+:toclevels: 3
+:pagenums:
+:sectnums:
+:imagesdir: images
+:source-highlighter: prettify
+
+== SpringBootとは
+SpringBootはSpringプロダクトを利用したアプリケーションを迅速に作るためのもの。  +
+ツールと呼ぶのが正しくないように思える。作成できるアプリケーションはSpringMVCだけではなくSpringBatchも可能となる。
+
+== SpringBootのメリット・デメリット
+=== メリット
+- 依存ライブラリの管理が楽
+- 面倒な設定をしなくても動作させることができる
+- 覚えれば設定が簡単
+- Springに関する技術情報のほとんどがSpringBootベース
+
+=== デメリット
+- 勝手に行われる設定がわかりにくい
+- 開発時のスタートはよくても最終的には全体的に設定を押さえておかなければいけない
+
+=== その他番外編
+XMLの設定ファイルがSpringBootにはない::
+SpringFrameworkはもともとApplicationContextと呼ばれるXMLを書くことでDIコンテナやAOPを始めとする様々な設定を行うことができた。これらは大規模なシステム開発に用いられた際に膨大な量となり人によってはXML地獄と読んだりするほどまで膨れ上がった。 +
+しかしデメリットばかりではない。言い換えればXMLさえ読めれば設定を明示的に追うことができ、もっというと規則に従って自動的にすら追うことすらできた。 +
+時代がアノテーションを求めるようになり、XML定義から解放されるといううたい文句も元、SpringFrameworkのみならず多くのフレームワークがアノテーションに対応を始めた。その結果XMLによる定義ファイルはJavaのコード＋アノテーションで定義するようになっていった。SpringBootはそのJavaコード達すら書くことなくSpringが考える王道的なデフォルトの設定を自動で行ってくれて、よくカスタムしたいポイントのみをPropertiesファイルまたはYAMLという形式のファイルに書くことで別定義できるようにした。 +
+これらの時代の変化の現時点の姿はメリット・デメリットの他に個人の好き嫌いレベルの宗教戦争にもなり得るが、あくまでフレームワークのユーザーという立場である以上従わざるを得ない。 +
+世の中のトレンドに沿わなければGoogleで検索するのも一苦労となる。世の中の情報発信者は常にトレンドを追い求めている可能性が高い。故に古い技術を使うことは宗教戦争と割り切れないほどのデメリットが潜んでいたりするものだ。
+
+== SpringBootの使い始め
+
+=== 基本ライブラリ
+SpringBootを利用するには、依存ライブラリを追加する。 +
+以下はGradleでの例
+[source,groovy]
+----
+dependencies {
+	compile('org.springframework.boot:spring-boot-starter')
+}
+----
+
+=== 追加ライブラリ
+SpringBootは作成したいアプリケーションによって依存ライブラリを追加する。 +
+例えばSpringMVCのアプリケーションを作成したいのであれば以下を追加する。
+[source,groovy]
+----
+dependencies {
+    compile("org.springframework.boot:spring-boot-starter-web")
+}
+----
+
+このようにして簡単にアプリケーションで実装したい機能のライブラリと必要なライブラリを追加することができる。
+
+=== Spring Initializr
+https://start.spring.io/[SpringInitializr] というサイトを利用し、SpringBootのアプリケーション＋利用したいライブラリ等を含んだ開発のスタート状態のプロジェクトを作ることができる。ビルドシステムはGradleかMavenのどちらかを選択することができる。
+
+
+== SpringBootでWebアプリケーションを作る
+
+=== 作るもの
+RESTによるWebサービスを作成する。 +
+リソースに対するCRUD操作をHTTPのPOST/GET/PUT/DELETEとしてAPIで定義する。 +
+永続化はデータベースに行い、MySQLを使用する。
+
+=== データベース接続
+
+==== 設定ファイルの定義
+
+==== アイドル時間が長い場合の接続エラー
+SpringBootでデータベース接続を行っている場合に、長時間何も操作が行われなかった（アイドル状態の）WEBアプリケーションに対してリクエストを送ると以下のようなエラーが発生する。 +
+
+[source,sh]
+----
+com.mysql.jdbc.exceptions.jdbc4.MySQLNonTransientConnectionException: No operations allowed after connection closed.
+	at sun.reflect.NativeConstructorAccessorImpl.newInstance0(Native Method)
+	at sun.reflect.NativeConstructorAccessorImpl.newInstance(NativeConstructorAccessorImpl.java:62)
+
+〜省略〜
+
+Caused by: com.mysql.jdbc.exceptions.jdbc4.CommunicationsException: The last packet successfully received from the server was 265,340,734 milliseconds ago.  The last packet sent successfully to the server was 265,340,734 milliseconds ago. is longer than the server configured value of 'wait_timeout'. You should consider either expiring and/or testing connection validity before use in your application, increasing the server configured values for client timeouts, or using the Connector/J connection property 'autoReconnect=true' to avoid this problem.
+	at sun.reflect.NativeConstructorAccessorImpl.newInstance0(Native Method)
+	at sun.reflect.NativeConstructorAccessorImpl.newInstance(NativeConstructorAccessorImpl.java:62)
+	
+〜省略〜
+
+----
+
+このエラーはプーリングされたコネクションから取得したコネクションは既に
+タイムアウトが発生していて接続できてないということである。
+
+
+
+== SpringBoot Gradle Plugin
+SpringBootのGradleプラグインを入れるとこれら以外にもたくさんのことができる。 +
+https://docs.spring.io/spring-boot/docs/current/reference/html/build-tool-plugins-gradle-plugin.html
+
+
+
+== 環境依存値の取り込み
+
+SpringBootにおける環境依存値を取り込む方法はいくつか存在するが、通常利用する方法は以下の２つになるのではないかと思う。
+
+- プロファイルにて環境に応じた設定ファイルを読み分ける
+- spring.config.locationを利用してプロパティファイルを読み込み
+
+
+== ロギング
+SpringBootのロギングはデフォルト設定では、SLF4Jとlogbackにて実現されている。 +
+logbackの設定ファイルはデフォルト定義が用意されており、差分を定義することでカスタマイズを行うようになっている。 +
+独自のlogbackの定義ファイルはSpringBootのJarの中に含まれている。
+
+.デフォルトロギング定義一覧
+[width="100%",options="header", cols="1,4,2,5"]
+|====================
+|ファイル名|パス|Jar|内容  
+| base.xml | org/springframework/boot/logging/logback | spring-boot-{VERSION}.jar | 基礎となる定義。この定義から他のファイルが読み込まれている。
+| defaluts.xml | org/springframework/boot/logging/logback | spring-boot-{VERSION}.jar | デフォルトの設定が定義されている。ロガーのレベル等。
+| console-appender.xml | org/springframework/boot/logging/logback | spring-boot-{VERSION}.jar | コンソールログを出力するアペンダーの定義が書いてある
+| file-appender.xml | org/springframework/boot/logging/logback | spring-boot-{VERSION}.jar | ファイルにログを出力するアペンダーの定義が書いてある 
+|====================
+
+差分のカスタマイズ方法としては、上記の「base.xml」を読み込む前に上書きしたい内容を定義する必要がある。 +
+以下にコンソールログの出力パターンを変更する例を示す。
+
+.base.xml
+[source,xml]
+----
+〜省略〜
+
+<property name="CONSOLE_LOG_PATTERN" value="${CONSOLE_LOG_PATTERN:-%clr(%d{yyyy-MM-dd HH:mm:ss.SSS}){faint} %clr(${LOG_LEVEL_PATTERN:-%5p}) %clr(${PID:- }){magenta} %clr(---){faint} %clr([%15.15t]){faint} %clr(%-40.40logger{39}){cyan} %clr(:){faint} %m%n${LOG_EXCEPTION_CONVERSION_WORD:-%wEx}}"/>
+
+〜省略〜
+
+----
+
+.console-appender.xml
+[source,xml]
+----
+<included>
+	<appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
+		<encoder>
+			<pattern>${CONSOLE_LOG_PATTERN}</pattern>
+			<charset>utf8</charset>
+		</encoder>
+	</appender>
+</included>
+----
+
+デフォルト定義では、base.xmlに定義されたコンソールログの出力パターンをconsole-appender.xmlで参照している。 +
+この時base.xmlの記載方法がといった記法
+----
+${変数名:-デフォルト定義}
+----
+
+
+
+== 自動設定
+
+== リリース
+SpringBoot
+
+
+
+
