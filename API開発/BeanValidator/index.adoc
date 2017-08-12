@@ -1,7 +1,0 @@
-= BeanValidator
-
-== TYPE_USE
-Java8からGenericの型に対してアノテーションが付与できるようになった。 +
-それを利用して、BeanValidationでも要素の型に対してチェックを実施できるようになったようだ。 +
-これはStringのListとかに有効となる。 +
-https://docs.jboss.org/hibernate/stable/validator/reference/en-US/html_single/#type-arguments-constraints[こちら]が参考リンク
