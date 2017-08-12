@@ -85,7 +85,7 @@ com.mysql.jdbc.exceptions.jdbc4.MySQLNonTransientConnectionException: No operati
 Caused by: com.mysql.jdbc.exceptions.jdbc4.CommunicationsException: The last packet successfully received from the server was 265,340,734 milliseconds ago.  The last packet sent successfully to the server was 265,340,734 milliseconds ago. is longer than the server configured value of 'wait_timeout'. You should consider either expiring and/or testing connection validity before use in your application, increasing the server configured values for client timeouts, or using the Connector/J connection property 'autoReconnect=true' to avoid this problem.
 	at sun.reflect.NativeConstructorAccessorImpl.newInstance0(Native Method)
 	at sun.reflect.NativeConstructorAccessorImpl.newInstance(NativeConstructorAccessorImpl.java:62)
-	
+
 〜省略〜
 
 ----
@@ -109,61 +109,16 @@ SpringBootにおける環境依存値を取り込む方法はいくつか存在�
 - spring.config.locationを利用してプロパティファイルを読み込み
 
 
-== ロギング
-SpringBootのロギングはデフォルト設定では、SLF4Jとlogbackにて実現されている。 +
-logbackの設定ファイルはデフォルト定義が用意されており、差分を定義することでカスタマイズを行うようになっている。 +
-独自のlogbackの定義ファイルはSpringBootのJarの中に含まれている。
-
-.デフォルトロギング定義一覧
-[width="100%",options="header", cols="1,4,2,5"]
-|====================
-|ファイル名|パス|Jar|内容  
-| base.xml | org/springframework/boot/logging/logback | spring-boot-{VERSION}.jar | 基礎となる定義。この定義から他のファイルが読み込まれている。
-| defaluts.xml | org/springframework/boot/logging/logback | spring-boot-{VERSION}.jar | デフォルトの設定が定義されている。ロガーのレベル等。
-| console-appender.xml | org/springframework/boot/logging/logback | spring-boot-{VERSION}.jar | コンソールログを出力するアペンダーの定義が書いてある
-| file-appender.xml | org/springframework/boot/logging/logback | spring-boot-{VERSION}.jar | ファイルにログを出力するアペンダーの定義が書いてある 
-|====================
-
-差分のカスタマイズ方法としては、上記の「base.xml」を読み込む前に上書きしたい内容を定義する必要がある。 +
-以下にコンソールログの出力パターンを変更する例を示す。
-
-.base.xml
-[source,xml]
-----
-〜省略〜
-
-<property name="CONSOLE_LOG_PATTERN" value="${CONSOLE_LOG_PATTERN:-%clr(%d{yyyy-MM-dd HH:mm:ss.SSS}){faint} %clr(${LOG_LEVEL_PATTERN:-%5p}) %clr(${PID:- }){magenta} %clr(---){faint} %clr([%15.15t]){faint} %clr(%-40.40logger{39}){cyan} %clr(:){faint} %m%n${LOG_EXCEPTION_CONVERSION_WORD:-%wEx}}"/>
-
-〜省略〜
-
-----
-
-.console-appender.xml
-[source,xml]
-----
-<included>
-	<appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
-		<encoder>
-			<pattern>${CONSOLE_LOG_PATTERN}</pattern>
-			<charset>utf8</charset>
-		</encoder>
-	</appender>
-</included>
-----
-
-デフォルト定義では、base.xmlに定義されたコンソールログの出力パターンをconsole-appender.xmlで参照している。 +
-この時base.xmlの記載方法がといった記法
-----
-${変数名:-デフォルト定義}
-----
-
-
+////////
+ロギング
+////////
+include::logging.adoc[]
 
 == 自動設定
 
 == リリース
 SpringBoot
 
+== サービスとして利用する場合
 
-
-
+== Actuator
