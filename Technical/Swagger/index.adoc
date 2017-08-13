@@ -291,3 +291,37 @@ dependencies {
   compile group: 'io.springfox', name: 'springfox-swagger-ui', version: "${springfoxVersion}"
 }
 ----
+
+=== 設定（SpringBoot）
+
+Configurationクラスを作成し、以下のような実装を加える。
+
+.Swagger設定
+[source, java]
+----
+@Configuration
+@EnableSwagger2
+public class Swagger2Configuration {
+
+  @Bean
+  public Docket document() {
+    return new Docket(DocumentationType.SWAGGER_2).select()
+    .apis(RequestHandlerSelectors.basePackage("com.zomu.t.studyswagger"))
+    .build();
+  }
+
+}
+----
+
+上記のコードではSwagger-UIに出すAPIを絞っているが、これをやらないとSpringBootのErrorControllerとか、
+Actuatorとかいろいろ出てくるので利用しづらい＋それらはSwagger-UIで見えるべきではないので抑制している。 +
+ +
+実装の詳細は以下のページを確認してもらいたい。 +
+https://springfox.github.io/springfox/docs/snapshot/
+
+=== 利用
+
+デフォルト状態であれば、以下のURLでブラウザよりアクセスするとドキュメント＋簡易ドライバを見ることができる。 +
+http://localhost:8080/swagger-ui.html
+
+image::swagger_swaggerui_001.png[Swagger-UI画面]
