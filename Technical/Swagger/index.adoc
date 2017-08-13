@@ -194,7 +194,7 @@ Swaggerにて出力されたRESTクライアントのクラス群のうち、
 さらにAPI実行クラスはRestTemplateをコンストラクタインジェクションにてもらうようになっているため、
 利用するには自分自身でRestTemplateをDIコンテナに登録しておかなければならない。とはいえ、以下のようなコードを定義するだけである。
 
-[source, java]
+[source, java, linenums]
 ----
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
