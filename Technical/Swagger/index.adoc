@@ -109,7 +109,56 @@ Swaggerで出力されるRestTemplateの様々な内容の調査結果を記載�
 
 ===== 出力設定ファイル
 ソースコード出力時にJSONの設定ファイルにて細かな設定を行うことができる。 +
-その内容の一覧は以下。（Swagger Codegen Cli 2.2.3）
+その内容の一覧は以下。（Swagger Codegen Cli 2.2.3のデフォルト）
+
+[cols="30,10,60", option="header"]
+|====
+
+|要素
+|型
+|説明
+
+|modelPackage
+|String
+|APIで利用するモデルクラスの出力パッケージを指定
+
+|apiPackage
+|String
+|API個別クライアントクラスの出力パッケージを指定
+
+|invokerPackage
+|String
+|API実行のためのコアRESTクライアントの出力パッケージを指定
+
+|serializableModel
+|Boolean
+|モデルクラスがSerializableを実装するかどうかを指定
+
+|dateLibrary
+|String
+|日付時刻に関してどのようなライブラリもしくはクラスを利用するかを指定。joda（JodaTime）、legacy（java.utl.Date）、java8-localdatetime（Java8のjava8-LocalDateTime）、java8（Java8）
+
+|useBeanValidation
+|Boolean
+|BeanValidationを利用するかどうか
+
+|====
+
+.実装例
+[source, json]
+----
+{
+	"modelPackage": "hoge.fuga.piyo.client.model",
+	"apiPackage": "hoge.fuga.piyo.client.api",
+	"invokerPackage": "hoge.fuga.piyo",
+        "dateLibrary": "java8",
+	"useBeanValidation": true,
+	"serializableModel": true
+}
+----
+
+自分の出力したいように上記をカスタマイズすることができる。 +
+これより細かい内容をカスタマイズするとなるとテンプレートのカスタマイズを行うしかないように思う。
 
 
 ==== クラス構成
