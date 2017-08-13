@@ -10,8 +10,8 @@
 :source-highlighter: prettify
 
 == Swaggerとは
-
-SwaggerとはOpenAPIに基づいた
+Swaggerとは、、、こういうのを語るほどギークではないので以下を参照。 +
+https://news.mynavi.jp/itsearch/article/devsoft/2395
 
 
 == 使い方
@@ -82,10 +82,34 @@ NOTE: 上記に挙げた以外のメディアタイプが利用できる場合�
 
 == サーバーサイド出力
 
-=== spring - springboot
+=== Spring - SpringBoot
 SpringのBootによるサーバーサイドコードの出力が可能。 +
 Swaggerで出力されるサーバーサイドコードの様々な内容の調査結果を記載する。（2017/08）
 
+==== 出力指定
+
+===== 出力設定ファイル
+
+==== 注意点
+
+===== Jackson利用時の日付型について
+日付型の解決を「java8」（JSR-310）にした場合、日付は「java.time.LocalDate」となり日付時刻は「java.time.OffsetDateTime」となるわけだが、
+Jacksonでは以下のライブラリを依存関係に追加しておかなければリクエストの解析でエラーとなる。
+
+.エラー例
+[source, bash]
+----
+2017-08-14 00:13:38.699  WARN 79700 --- [nio-8080-exec-1] .w.s.m.s.DefaultHandlerExceptionResolver : Failed to read HTTP message: org.springframework.http.converter.HttpMessageNotReadableException: JSON parse error: Can not construct instance of java.time.LocalDate: no String-argument constructor/factory method to deserialize from String value ('2017-08-13'); nested exception is com.fasterxml.jackson.databind.JsonMappingException: Can not construct instance of java.time.LocalDate: no String-argument constructor/factory method to deserialize from String value ('2017-08-13')
+ at [Source: java.io.PushbackInputStream@781d90da; line: 3, column: 15] (through reference chain: com.zomu.t.studyswagger.gen.application.model.DataTypeVerification["dateProp"])
+----
+
+追加するライブラリは以下となる。
+
+.gradle例
+[source, groovy]
+----
+compile group: 'com.fasterxml.jackson.datatype', name: 'jackson-datatype-jsr310', version: '${適宜バージョン}'
+----
 
 == クライアント出力
 
@@ -142,18 +166,23 @@ Swaggerで出力されるRestTemplateの様々な内容の調査結果を記載�
 |Boolean
 |BeanValidationを利用するかどうか
 
+|hideGenerationTimestamp
+|Boolean
+|ソースコードに自動生成を行なったことを示すアノテーションと出力タイムスタンプを付与するかどうか。
+trueの場合は「@javax.annotation.Generated」が付与される。
+
 |====
 
 .実装例
 [source, json]
 ----
 {
-	"modelPackage": "hoge.fuga.piyo.client.model",
-	"apiPackage": "hoge.fuga.piyo.client.api",
-	"invokerPackage": "hoge.fuga.piyo",
-        "dateLibrary": "java8",
-	"useBeanValidation": true,
-	"serializableModel": true
+  "modelPackage": "hoge.fuga.piyo.client.model",
+  "apiPackage": "hoge.fuga.piyo.client.api",
+  "invokerPackage": "hoge.fuga.piyo",
+  "dateLibrary": "java8",
+  "useBeanValidation": true,
+  "serializableModel": true
 }
 ----
 
@@ -218,3 +247,47 @@ public class RestClientConfiguration {
 ==== 処理内容
 
 RestTemplate
+
+
+==== 注意点
+
+===== タイムゾーン
+ApiClientクラスの設定によりデフォルトのタイムゾーンは「UTC」となっている。 +
+仮にシステムのタイムゾーンを全て「JST」で考えているようであればクライアントの設定も同様に変更する必要があるが、
+外部から変更できるような設定要素も持っていないためテンプレートの修正が必要となる。
+
+.テンプレートの実装
+[source, java]
+----
+protected void init() {
+  // Use RFC3339 format for date and datetime.
+  // See http://xml2rfc.ietf.org/public/rfc/html/rfc3339.html#anchor14
+  this.dateFormat = new RFC3339DateFormat();
+
+  // Use UTC as the default time zone.
+  this.dateFormat.setTimeZone(TimeZone.getTimeZone("UTC"));
+
+  // Set default User-Agent.
+  setUserAgent("Java-SDK");
+----
+
+== SpringFox
+
+=== SpringFoxとは
+
+SpringMVCのアプリケーションで提供されているRESTに対するAPIドキュメントを自動生成してくれるもの。
+内部ではSwaggerが利用されており、簡易的なドライバにも利用できるUIが生成されるので便利である。
+また、OpenAPI形式のJSONを取得できたりもする。
+
+=== 導入（SpringBoot）
+
+以下を依存関係に追加。
+
+.gradle例
+[source, groovy]
+----
+dependencies {
+  compile group: 'io.springfox', name: 'springfox-swagger2', version: "${springfoxVersion}"
+  compile group: 'io.springfox', name: 'springfox-swagger-ui', version: "${springfoxVersion}"
+}
+----
