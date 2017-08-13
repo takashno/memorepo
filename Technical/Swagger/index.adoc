@@ -182,3 +182,36 @@ RestTemplateによるRESTクライアントは以下のようの構成でクラ�
 
 
 |====
+
+==== 利用方法
+Swaggerにて出力されたRESTクライアントのクラス群のうち、
+利用するのは上記で勝手に名付けているAPI個別クライアントとなるわけだが、
+@Componentが付いているため利用したいクラスでインジェクションして利用することができる。 +
+ +
+このAPI個別クライアントは、内部でAPI実行クラス（ApiClient）をコンストラクタインジェクションで
+もらうようになっているためAPI実行クラスが初期化されていなければ利用できない。 +
+ +
+さらにAPI実行クラスはRestTemplateをコンストラクタインジェクションにてもらうようになっているため、
+利用するには自分自身でRestTemplateをDIコンテナに登録しておかなければならない。とはいえ、以下のようなコードを定義するだけである。
+
+[source, java]
+----
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.web.client.RestTemplate;
+
+@Configuration
+public class RestClientConfiguration {
+
+  @Bean
+  public RestTemplate getRestTemplate() {
+   return new RestTemplate();
+  }
+
+}
+----
+
+
+==== 処理内容
+
+RestTemplate
