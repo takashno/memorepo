@@ -1,4 +1,4 @@
-= Swagger
+= Swagger v2
 :toc:
 :toc-title: 目次
 :figure-caption: 図
@@ -210,6 +210,9 @@ public class RestClientConfiguration {
 
 }
 ----
+
+このようにして、自分で利用するRestTemplateを生成することができるためインターセプター等を自分で設定して
+自動生成したクラスで処理することができる。とても利便性をよく考えられていると思うと同時に勉強になる。
 
 
 ==== 処理内容
