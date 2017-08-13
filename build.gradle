@@ -12,32 +12,31 @@ buildscript {
     }
 }
 
-allprojects {
+subprojects {
 
-apply plugin: 'org.asciidoctor.convert'
-apply plugin: 'org.asciidoctor.gradle.asciidoctor'
+  apply plugin: 'org.asciidoctor.convert'
+  apply plugin: 'org.asciidoctor.gradle.asciidoctor'
 
+  version = '1.0.0-SNAPSHOT'
 
-version = '1.0.0-SNAPSHOT'
+  asciidoctorj {
+      version = '1.5.5'
+  }
 
-asciidoctorj {
-    version = '1.5.5'
-}
-
-asciidoctor {
-  backends = ['html5']
-  //backends = ['html5','pdf']
-  requires = ['asciidoctor-diagram']
-  sourceDir = file('.')
-  //  sources {
-  //    include '**/*.adoc'
-  //  }
-  //resources {
-  //  from(sourceDir) {
-  //    include '**/images/**/*.png'
-  //  }
-  //}
-  outputDir = rootProject.file('publish')
-}
+  asciidoctor {
+    backends = ['html5']
+    //backends = ['html5','pdf']
+    requires = ['asciidoctor-diagram']
+    sourceDir = file('.')
+    sources {
+      include '**/*.adoc'
+    }
+    resources {
+      from(sourceDir) {
+        include 'images/**/*.png'
+      }
+    }
+    outputDir = file('publish')
+  }
 
 }
