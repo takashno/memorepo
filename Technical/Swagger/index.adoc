@@ -23,6 +23,53 @@ http://editor2.swagger.io/
 
 最近新しくなった？？
 
+== 対応メディアタイプ
+=== produces
+リソースから返却するMIMEタイプであるProducesには以下を指定することができる。
+
+[cols="40,60", option="header"]
+|====
+
+|type
+|説明
+
+|application/json
+|
+
+|application/xml
+|
+
+|====
+
+NOTE: 上記に挙げた以外のメディアタイプが利用できる場合においてもAPI設計として対応しないほうが無難だと思われる
+
+
+=== consumes
+
+[cols="40,60", option="header"]
+|====
+
+|type
+|説明
+
+|application/json
+|
+
+|application/xml
+|
+
+|application/octet-stream
+|
+
+|application/x-www-form-urlencoded
+|
+
+|multipart/form-data
+|
+
+
+|====
+
 == Javaの型
 
 == Validation
@@ -32,6 +79,7 @@ http://editor2.swagger.io/
 === spring - springboot
 SpringのBootによるサーバーサイドコードの出力が可能。 +
 Swaggerで出力されるサーバーサイドコードの様々な内容の調査結果を記載する。（2017/08）
+
 
 == クライアント出力
 
