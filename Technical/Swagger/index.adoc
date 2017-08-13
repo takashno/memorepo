@@ -4,8 +4,8 @@
 :figure-caption: 図
 :table-caption: 表
 :toclevels: 3
-:pagenums:
-:sectnums:
+//:pagenums:
+//:sectnums:
 :imagesdir: images
 :source-highlighter: prettify
 
@@ -194,7 +194,7 @@ Swaggerにて出力されたRESTクライアントのクラス群のうち、
 さらにAPI実行クラスはRestTemplateをコンストラクタインジェクションにてもらうようになっているため、
 利用するには自分自身でRestTemplateをDIコンテナに登録しておかなければならない。とはいえ、以下のようなコードを定義するだけである。
 
-[source, java, linenums]
+[source, java, numbered]
 ----
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
