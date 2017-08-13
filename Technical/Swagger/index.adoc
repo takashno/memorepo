@@ -1,0 +1,69 @@
+= Swagger
+:toc:
+:toc-title: 目次
+:figure-caption: 図
+:table-caption: 表
+:toclevels: 3
+:pagenums:
+:sectnums:
+:imagesdir: images
+:source-highlighter: prettify
+
+== Swaggerとは
+
+SwaggerとはOpenAPIに基づいた
+
+
+== 利用方法
+
+Swaggerを利用するには、まずYAMLを作成する必要がある。 +
+YAMLの作成にはSwaggerが提供しているエディタを利用するのが便利である。 +
+
+http://editor2.swagger.io/
+
+最近新しくなった？？
+
+== Javaの型
+
+== Validation
+
+== サーバーサイド出力
+
+=== spring - springboot
+SpringのBootによるサーバーサイドコードの出力が可能。 +
+Swaggerで出力されるサーバーサイドコードの様々な内容の調査結果を記載する。（2017/08）
+
+== クライアント出力
+
+=== Java - RestTemplate
+SpringのRestTemplateによるクライアントサイドコードの出力が可能。 +
+Swaggerで出力されるRestTemplateの様々な内容の調査結果を記載する。（2017/08）
+
+==== 出力指定
+出力時の指定は以下の通り。
+
+[cols="30,70", option="header"]
+|====
+
+|language
+|library
+
+| java
+| resttemplate
+
+|====
+
+==== クラス構成
+
+RestTemplateによるRESTクライアントは以下のようの構成でクラスが分割されている。 +
+
+[cols="30,70", option="header"]
+|====
+
+|種類
+|用途
+
+|モデル
+|
+
+|====
