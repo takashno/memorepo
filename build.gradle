@@ -12,7 +12,7 @@ buildscript {
     }
 }
 
-subprojects {
+configure(subprojects - project(':Technical')) {
 
   apply plugin: 'org.asciidoctor.convert'
   apply plugin: 'org.asciidoctor.gradle.asciidoctor'
@@ -30,11 +30,6 @@ subprojects {
     sourceDir = file('.')
     sources {
       include '**/*.adoc'
-    }
-    resources {
-      from(sourceDir) {
-        include 'images/**/*.png'
-      }
     }
     outputDir = file('publish')
   }
