@@ -1,0 +1,5 @@
+rootProject.name = 'takashno.github.io'
+include 'Technical:ApacheCamel'
+include 'Technical:Swagger'
+include 'Technical:SpringBoot'
+include 'Technical:Logback'

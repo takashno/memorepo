@@ -12,6 +12,8 @@ buildscript {
     }
 }
 
+allprojects {
+
 apply plugin: 'org.asciidoctor.convert'
 apply plugin: 'org.asciidoctor.gradle.asciidoctor'
 
@@ -27,13 +29,15 @@ asciidoctor {
   //backends = ['html5','pdf']
   requires = ['asciidoctor-diagram']
   sourceDir = file('.')
-//  sources {
-//    include '**/*.adoc'
-//  }
+  //  sources {
+  //    include '**/*.adoc'
+  //  }
   //resources {
   //  from(sourceDir) {
   //    include '**/images/**/*.png'
   //  }
   //}
-  outputDir = file('publish')
+  outputDir = rootProject.file('publish')
+}
+
 }
