@@ -83,11 +83,41 @@ NOTE: 上記に挙げた以外のメディアタイプが利用できる場合�
 
 == Validation
 
+== ファイルアップロード
+上述の「consumes」の一覧を見てもらえばわかる通りSwaggerではファイルアップロードに対応している。
+ただし、SwaggerのV2（OpenAPIのverison2.0なのかな・・・）では複数ファイルのアップロードが柔軟に指定できなかったりするようだ。
+この辺りがOpenAPIのversion3.0.0では解消されるらしい。 +
+
+参考: +
+https://swagger.io/specification/ +
+ +
+
 == サーバーサイド出力
 
 === Spring - SpringBoot
 SpringのBootによるサーバーサイドコードの出力が可能。 +
 Swaggerで出力されるサーバーサイドコードの様々な内容の調査結果を記載する。（2017/08）
+
+==== ファイルアップロード
+SpringBootではControllerでMultipartを利用することにより「multipart/form-data」を受け取ることができる。
+デフォルトのテンプレートでは１つのファイルのみ受け取ることができパラメータ名も「file」で固定される。
+これが嫌な場合は自分でテンプレートを修正する必要がある。
+
+.テンプレート
+[source, mustache]
+----
+{{#isFormParam}}{{#notFile}}@ApiParam(value = "{{{description}}}"{{#required}}, required=true{{/required}}{{#allowableValues}}, allowableValues="{{#values}}{{{.}}}{{^-last}}, {{/-last}}{{#-last}}{{/-last}}{{/values}}"{{/allowableValues}}{{#defaultValue}}, defaultValue="{{{defaultValue}}}"{{/defaultValue}}) @RequestPart(value="{{baseName}}"{{#required}}, required=true{{/required}}{{^required}}, required=false{{/required}})  {{{dataType}}} {{paramName}}{{/notFile}}{{#isFile}}@ApiParam(value = "file detail") {{#useBeanValidation}}@Valid{{/useBeanValidation}} @RequestPart("file") MultipartFile {{baseName}}{{/isFile}}{{/isFormParam}}
+----
+mustacheは慣れてる人がみる＋バインドするモデルをわかっていないと意味不明だと思われる。 +
+以下の辺りが固定と言っている内容にあたる。
+
+[source, mustache]
+----
+@RequestPart("file") MultipartFile {{baseName}}{{/isFile}}
+----
+
+参考： +
+https://github.com/swagger-api/swagger-codegen/blob/master/modules/swagger-codegen/src/main/resources/JavaSpring/formParams.mustache
 
 ==== 出力指定
 
@@ -217,8 +247,23 @@ RestTemplateによるRESTクライアントは以下のようの構成でクラ�
 
 ==== 利用方法
 Swaggerにて出力されたRESTクライアントのクラス群のうち、
-利用するのは上記で勝手に名付けているAPI個別クライアントとなるわけだが、
+利用するのはAPI個別クライアント(上記で勝手に名付けている)となるわけだが、
 @Componentが付いているため利用したいクラスでインジェクションして利用することができる。 +
+ +
+
+.利用例
+[source, java]
+----
+
+@Autowired
+{タグ名}Api hogeApi;
+
+〜 省略 〜
+
+{レスポンスの型} response = hogeApi.{operationId}({引数});
+
+----
+かなりの雰囲気ベースだとこのような形で利用できる。 +
  +
 このAPI個別クライアントは、内部でAPI実行クラス（ApiClient）をコンストラクタインジェクションで
 もらうようになっているためAPI実行クラスが初期化されていなければ利用できない。 +
@@ -226,7 +271,7 @@ Swaggerにて出力されたRESTクライアントのクラス群のうち、
 さらにAPI実行クラスはRestTemplateをコンストラクタインジェクションにてもらうようになっているため、
 利用するには自分自身でRestTemplateをDIコンテナに登録しておかなければならない。とはいえ、以下のようなコードを定義するだけである。
 
-[source, java, numbered]
+[source, java]
 ----
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -249,7 +294,7 @@ public class RestClientConfiguration {
 
 ==== 処理内容
 
-RestTemplate
+
 
 
 ==== 注意点
