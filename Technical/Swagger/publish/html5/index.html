@@ -441,10 +441,12 @@ body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-b
 </li>
 <li><a href="#_javaの型">Javaの型</a></li>
 <li><a href="#_validation">Validation</a></li>
+<li><a href="#_ファイルアップロード">ファイルアップロード</a></li>
 <li><a href="#_サーバーサイド出力">サーバーサイド出力</a>
 <ul class="sectlevel2">
 <li><a href="#_spring_springboot">Spring - SpringBoot</a>
 <ul class="sectlevel3">
+<li><a href="#_ファイルアップロード_2">ファイルアップロード</a></li>
 <li><a href="#_出力指定">出力指定</a></li>
 <li><a href="#_注意点">注意点</a></li>
 </ul>
@@ -611,6 +613,21 @@ YAMLの作成にはSwaggerが提供しているエディタを利用するのが
 </div>
 </div>
 <div class="sect1">
+<h2 id="_ファイルアップロード">ファイルアップロード</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>上述の「consumes」の一覧を見てもらえばわかる通りSwaggerではファイルアップロードに対応している。
+ただし、SwaggerのV2（OpenAPIのverison2.0なのかな・・・）では複数ファイルのアップロードが柔軟に指定できなかったりするようだ。
+この辺りがOpenAPIのversion3.0.0では解消されるらしい。<br></p>
+</div>
+<div class="paragraph">
+<p>参考:<br>
+<a href="https://swagger.io/specification/" class="bare">https://swagger.io/specification/</a><br>
+<br></p>
+</div>
+</div>
+</div>
+<div class="sect1">
 <h2 id="_サーバーサイド出力">サーバーサイド出力</h2>
 <div class="sectionbody">
 <div class="sect2">
@@ -618,6 +635,33 @@ YAMLの作成にはSwaggerが提供しているエディタを利用するのが
 <div class="paragraph">
 <p>SpringのBootによるサーバーサイドコードの出力が可能。<br>
 Swaggerで出力されるサーバーサイドコードの様々な内容の調査結果を記載する。（2017/08）</p>
+</div>
+<div class="sect3">
+<h4 id="_ファイルアップロード_2">ファイルアップロード</h4>
+<div class="paragraph">
+<p>SpringBootではControllerでMultipartを利用することにより「multipart/form-data」を受け取ることができる。
+デフォルトのテンプレートでは１つのファイルのみ受け取ることができパラメータ名も「file」で固定される。
+これが嫌な場合は自分でテンプレートを修正する必要がある。</p>
+</div>
+<div class="listingblock">
+<div class="title">テンプレート</div>
+<div class="content">
+<pre class="prettyprint highlight"><code class="language-mustache" data-lang="mustache">{{#isFormParam}}{{#notFile}}@ApiParam(value = "{{{description}}}"{{#required}}, required=true{{/required}}{{#allowableValues}}, allowableValues="{{#values}}{{{.}}}{{^-last}}, {{/-last}}{{#-last}}{{/-last}}{{/values}}"{{/allowableValues}}{{#defaultValue}}, defaultValue="{{{defaultValue}}}"{{/defaultValue}}) @RequestPart(value="{{baseName}}"{{#required}}, required=true{{/required}}{{^required}}, required=false{{/required}})  {{{dataType}}} {{paramName}}{{/notFile}}{{#isFile}}@ApiParam(value = "file detail") {{#useBeanValidation}}@Valid{{/useBeanValidation}} @RequestPart("file") MultipartFile {{baseName}}{{/isFile}}{{/isFormParam}}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>mustacheは慣れてる人がみる＋バインドするモデルをわかっていないと意味不明だと思われる。<br>
+以下の辺りが固定と言っている内容にあたる。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight"><code class="language-mustache" data-lang="mustache">@RequestPart("file") MultipartFile {{baseName}}{{/isFile}}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>参考：<br>
+<a href="https://github.com/swagger-api/swagger-codegen/blob/master/modules/swagger-codegen/src/main/resources/JavaSpring/formParams.mustache" class="bare">https://github.com/swagger-api/swagger-codegen/blob/master/modules/swagger-codegen/src/main/resources/JavaSpring/formParams.mustache</a></p>
+</div>
 </div>
 <div class="sect3">
 <h4 id="_出力指定">出力指定</h4>
@@ -794,8 +838,23 @@ trueの場合は「@javax.annotation.Generated」が付与される。</p></td>
 <h4 id="_利用方法">利用方法</h4>
 <div class="paragraph">
 <p>Swaggerにて出力されたRESTクライアントのクラス群のうち、
-利用するのは上記で勝手に名付けているAPI個別クライアントとなるわけだが、
+利用するのはAPI個別クライアント(上記で勝手に名付けている)となるわけだが、
 @Componentが付いているため利用したいクラスでインジェクションして利用することができる。<br>
+<br></p>
+</div>
+<div class="listingblock">
+<div class="title">利用例</div>
+<div class="content">
+<pre class="prettyprint highlight"><code class="language-java" data-lang="java">@Autowired
+{タグ名}Api hogeApi;
+
+〜 省略 〜
+
+{レスポンスの型} response = hogeApi.{operationId}({引数});</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>かなりの雰囲気ベースだとこのような形で利用できる。<br>
 <br>
 このAPI個別クライアントは、内部でAPI実行クラス（ApiClient）をコンストラクタインジェクションで
 もらうようになっているためAPI実行クラスが初期化されていなければ利用できない。<br>
@@ -827,9 +886,7 @@ public class RestClientConfiguration {
 </div>
 <div class="sect3">
 <h4 id="_処理内容">処理内容</h4>
-<div class="paragraph">
-<p>RestTemplate</p>
-</div>
+
 </div>
 <div class="sect3">
 <h4 id="_注意点_2">注意点</h4>
@@ -933,7 +990,7 @@ Actuatorとかいろいろ出てくるので利用しづらい＋それらはSwa
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2017-08-14 03:39:18 +09:00
+Last updated 2017-08-14 23:19:49 +09:00
 </div>
 </div>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prettify/r298/prettify.min.css">
